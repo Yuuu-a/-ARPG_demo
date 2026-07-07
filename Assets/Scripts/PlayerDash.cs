@@ -1,40 +1,44 @@
 using UnityEngine;
 using StarterAssets;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
+[DefaultExecutionOrder(-10)]
 public class PlayerDash : MonoBehaviour
 {
-    [Header("Dash Settings")]
-    [SerializeField] private float dashSpeed = 8f;
-    [SerializeField] private float dashDuration = 0.2f;
-    [SerializeField] private float dashCooldown = 1f; //冷却
+    [Header("References")]
+    [SerializeField] private StarterAssetsInputs input;
+    [SerializeField] private PlayerAttack playerAttack;
+    [SerializeField] private Transform mainCameraTransform;
+#if ENABLE_INPUT_SYSTEM
+    [SerializeField] private PlayerInput playerInput;
+#endif
 
-    private StarterAssetsInputs _input;
-    private Transform _mainCameraTransform;
+    [Header("Dash Settings")]
+    [SerializeField] private float dashCooldown = 1f;
 
     private bool _isDashing;
-    private float _dashTimer;
+    private bool _dashTriggerRequested;
     private float _dashCooldownTimer;
     private Vector3 _dashDirection;
 
     public bool IsDashing => _isDashing;
-    public float DashSpeed => dashSpeed;
     public Vector3 DashDirection => _dashDirection;
 
-    private void Awake()
+    private void Reset()
     {
-        _input = GetComponent<StarterAssetsInputs>();
-
-        GameObject mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
-        if (mainCamera != null)
-        {
-            _mainCameraTransform = mainCamera.transform;
-        }
+        // 编辑器辅助填充，最终请在 Inspector 中确认引用。
+        input = GetComponent<StarterAssetsInputs>();
+        playerAttack = GetComponent<PlayerAttack>();
+#if ENABLE_INPUT_SYSTEM
+        playerInput = GetComponent<PlayerInput>();
+#endif
     }
 
-    private void Update() //先更新冷却时间，再更新冲刺状态，最后尝试开始冲刺
+    private void Update()
     {
         UpdateCooldown();
-        UpdateDashState();
         TryStartDash();
     }
 
@@ -46,25 +50,20 @@ public class PlayerDash : MonoBehaviour
         }
     }
 
-    private void UpdateDashState()
+    private void TryStartDash()
     {
-        if (!_isDashing)
+        if (_isDashing)
         {
             return;
         }
 
-        _dashTimer -= Time.deltaTime;
-
-        if (_dashTimer <= 0f)
+        if (playerAttack != null && playerAttack.IsAttacking)
         {
-            _isDashing = false;
-        }
-    }
+            if (input != null)
+            {
+                input.Dash = false;
+            }
 
-    private void TryStartDash()
-    {
-        if (_isDashing) //正在dash 不允许再次dash
-        {
             return;
         }
 
@@ -73,42 +72,83 @@ public class PlayerDash : MonoBehaviour
             return;
         }
 
-        if (!_input.Dash)
+        if (!HasDashInput())
         {
             return;
         }
 
         StartDash();
 
-        // 消耗这次输入，防止一直触发
-        _input.Dash = false;
+        if (input != null)
+        {
+            input.Dash = false;
+        }
+    }
+
+    private bool HasDashInput()
+    {
+        if (input != null && input.Dash)
+        {
+            return true;
+        }
+
+#if ENABLE_INPUT_SYSTEM
+        if (playerInput != null)
+        {
+            InputAction dashAction = playerInput.actions.FindAction("Dash", false);
+            return dashAction != null && dashAction.IsPressed();
+        }
+#endif
+
+        return false;
     }
 
     private void StartDash()
     {
         _isDashing = true;
-        _dashTimer = dashDuration;
         _dashCooldownTimer = dashCooldown;
-
         _dashDirection = GetDashDirection();
+
+        transform.rotation = Quaternion.LookRotation(_dashDirection, Vector3.up);
+        _dashTriggerRequested = true;
     }
 
-    private Vector3 GetDashDirection() //获取dash方向 这样的话dash方向就可以和移动方向一致了 如果没有移动方向 就朝角色当前面朝方向 Dash 
+    public bool ConsumeDashTrigger()
     {
-        Vector2 moveInput = _input.move;
+        // Trigger 只应该被 Animator 消费一次，避免每帧重复触发 Dash 动画。
+        if (!_dashTriggerRequested)
+        {
+            return false;
+        }
 
-        // 如果有移动输入，就朝移动方向 Dash
-        if (moveInput != Vector2.zero && _mainCameraTransform != null)
+        _dashTriggerRequested = false;
+        return true;
+    }
+
+    public void OnDashAnimationEnd()
+    {
+        EndDash();
+    }
+
+    private void EndDash()
+    {
+        _isDashing = false;
+    }
+
+    private Vector3 GetDashDirection()
+    {
+        Vector2 moveInput = input != null ? input.move : Vector2.zero;
+
+        if (moveInput != Vector2.zero && mainCameraTransform != null)
         {
             Vector3 inputDirection = new Vector3(moveInput.x, 0f, moveInput.y).normalized;
 
             float targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg
-                                   + _mainCameraTransform.eulerAngles.y;
+                                   + mainCameraTransform.eulerAngles.y;
 
             return Quaternion.Euler(0f, targetRotation, 0f) * Vector3.forward;
         }
 
-        // 如果没有移动输入，就朝角色当前面朝方向 Dash
         return transform.forward;
     }
 }
