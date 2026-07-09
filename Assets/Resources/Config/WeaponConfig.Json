@@ -1,0 +1,32 @@
+{
+  "ItemDataList": [
+    {
+      "id": 1,
+      "type": 1,
+      "name": "霰落星殿",
+      "description": "霰粒落于殿前，将她唤醒。暴风雪就要来临。",
+      "imagePath": "UIResources/ItemImage/weapon1"
+    },
+    {
+      "id": 2,
+      "type": 1,
+      "name": "十方锻星",
+      "description": "繁星化剑，她将勇气与爱紧紧握在掌间。",
+      "imagePath": "UIResources/ItemImage/weapon2"
+    },
+    {
+      "id": 3,
+      "type": 1,
+      "name": "狸法七变化",
+      "description": "巧夺天工的造型，饱含制作者对美的追求。",
+      "imagePath": "UIResources/ItemImage/weapon3"
+    },
+    {
+      "id": 4,
+      "type": 1,
+      "name": "首席跟班",
+      "description": "每一只罗斯凯利法的邦布都愿为首席专家小姐的科研事业上刀山下火海，而这一位的刀山无疑下得最快。",
+      "imagePath": "UIResources/ItemImage/weapon4"
+    }
+  ]
+}
