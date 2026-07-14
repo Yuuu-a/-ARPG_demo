@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01af04d6a7180b74da8123ab0015319c, type: 3}
+  m_Name: WeaponDataConfig
+  m_EditorClassIdentifier: 
+  itemDataList:
+  - id: 1
+    type: 1
+    name: "\u9730\u843D\u661F\u6BBF"
+    description: "\u9730\u7C92\u843D\u4E8E\u6BBF\u524D,\u5C06\u5979\u5524\u9192 \u66B4\u98CE\u96EA\u5C31\u8981\u6765\u4E34"
+    effectDescription: "\u66B4\u51FB\u4F24\u5BB3\u63D0\u534750%/57%/65%/72%/80%\uFF1B\u53D1\u52A8\u300C\u5F3A\u5316\u7279\u6B8A\u6280\u300D\u6216\u961F\u4F0D\u4E2D\u4EFB\u610F\u89D2\u8272\u5BF9\u654C\u4EBA\u65BD\u52A0\u5C5E\u6027\u5F02\u5E38\u6548\u679C\u65F6\uFF0C\u88C5\u5907\u8005\u9020\u6210\u7684\u51B0\u5C5E\u6027\u4F24\u5BB3\u63D0\u534720%/23%/26%/29%/32%\uFF0C\u6700\u591A\u53E0\u52A02\u5C42\uFF0C\u6301\u7EED15\u79D2\uFF0C\u6BCF\u5C42\u6548\u679C\u5355\u72EC\u7ED3\u7B97\u6301\u7EED\u65F6\u95F4\u3002"
+    ItemIcon: {fileID: 21300000, guid: 65b1fb498570b34468b0077f6c86eb6e, type: 3}
+    TypeIcon: {fileID: 21300000, guid: ce85ec584d21118429419fd94059eaae, type: 3}
+    baseAttack: 50
+    criticalRateBonusPercent: 10
+    attackBonusPercent: 0
+    maxHealthBonusPercent: 0
+  - id: 2
+    type: 1
+    name: "\u5341\u65B9\u953B\u661F"
+    description: "\u7E41\u661F\u5316\u5251,\u5979\u5C06\u52C7\u6C14\u4E0E\u7231\u7D27\u7D27\u63E1\u5728\u638C\u95F4"
+    effectDescription: "\u88C5\u5907\u8005\u7684\u5F02\u5E38\u638C\u63A7\u63D0\u534760/69/78/87/96\u70B9\uFF1B\u89E6\u53D1\u300C\u5F3A\u51FB\u300D\u65F6\uFF0C\u88C5\u5907\u8005\u9020\u6210\u7684\u7269\u7406\u4F24\u5BB3\u63D0\u534720%/23%/26%/29%/32%\uFF0C\u6301\u7EED20\u79D2\uFF0C\u6700\u591A\u53E0\u52A02\u5C42\uFF0C\u91CD\u590D\u89E6\u53D1\u65F6\u5237\u65B0\u6301\u7EED\u65F6\u95F4\uFF0C\u88C5\u5907\u8005\u8FDB\u5165\u63A5\u6218\u72B6\u6001\u65F6\uFF0C\u7ACB\u5373\u83B7\u5F972\u5C42\u6548\u679C\u3002"
+    ItemIcon: {fileID: 21300000, guid: e7a68ba4e89c0cb4ab7d8ffff2bf3eee, type: 3}
+    TypeIcon: {fileID: 21300000, guid: ce85ec584d21118429419fd94059eaae, type: 3}
+    baseAttack: 50
+    criticalRateBonusPercent: 0
+    attackBonusPercent: 10
+    maxHealthBonusPercent: 0
+  - id: 3
+    type: 1
+    name: "\u72F8\u6CD5\u4E03\u53D8\u5316"
+    description: "\u5DE7\u593A\u5929\u5DE5\u7684\u9020\u578B,\u9971\u542B\u5236\u4F5C\u8005\u5BF9\u7F8E\u7684\u8FFD\u6C42"
+    effectDescription: "\u88C5\u5907\u8005\u7684\u300C\u5F3A\u5316\u7279\u6B8A\u6280\u300D\u6216\u300C\u7EC8\u7ED3\u6280\u300D\u9020\u6210\u7269\u7406\u4F24\u5BB3\u65F6\uFF0C\u88C5\u5907\u8005\u5F02\u5E38\u638C\u63A7\u63D0\u534730/34/39/43/48\u70B9\uFF0C\u6301\u7EED40\u79D2\uFF1B\u88C5\u5907\u8005\u7684\u300C\u8FFD\u52A0\u653B\u51FB\u300D\u547D\u4E2D\u654C\u4EBA\u65F6\uFF0C\u4F7F\u5168\u961F\u89D2\u8272\u7684\u5F02\u5E38\u7CBE\u901A\u63D0\u534760/69/78/87/96\u70B9\uFF0C\u6301\u7EED40\u79D2\uFF0C\u8BE5\u6548\u679C\u5168\u961F\u552F\u4E00\u3002"
+    ItemIcon: {fileID: 21300000, guid: fca211306ad312641add93df98351949, type: 3}
+    TypeIcon: {fileID: 21300000, guid: 6cfdd8d05ab1d4445a8d1e15f55f0efa, type: 3}
+    baseAttack: 40
+    criticalRateBonusPercent: 0
+    attackBonusPercent: 0
+    maxHealthBonusPercent: 10
+  - id: 4
+    type: 1
+    name: "\u9996\u5E2D\u8DDF\u73ED"
+    description: "\u6BCF\u4E00\u53EA\u7F57\u65AF\u51EF\u5229\u6CD5\u7684\u90A6\u5E03\u90FD\u613F\u4E3A\u9996\u5E2D\u4E13\u5BB6\u5C0F\u59D0\u7684\u79D1\u7814\u4E8B\u4E1A\u4E0A\u5200\u5C71\u4E0B\u706B\u6D77,\u800C\u8FD9\u4E00\u4F4D\u7684\u5200\u5C71\u65E0\u7591\u4E0B\u5F97\u6700\u5FEB"
+    effectDescription: "\u88C5\u5907\u8005\u7684\u51B2\u51FB\u529B\u63D0\u534730/33/36/39/42\u70B9\uFF0C\u9020\u6210\u7684\u4F24\u5BB3\u65E0\u89C6\u76EE\u680715%/17.2%/19.5%/21.7%/24%\u706B\u5C5E\u6027\u4F24\u5BB3\u6297\u6027\uFF1B\u88C5\u5907\u8005\u4E3A\u975E\u64CD\u4F5C\u4E2D\u89D2\u8272\u65F6\uFF0C\u80FD\u91CF\u81EA\u52A8\u56DE\u590D\u63D0\u53470.4/0.46/0.52/0.58/0.64\u70B9/\u79D2\uFF1B"
+    ItemIcon: {fileID: 21300000, guid: 3f76cfe62f8e80741972d7910bbb6229, type: 3}
+    TypeIcon: {fileID: 21300000, guid: 116b308d5a69d90498c32cc4a7151d58, type: 3}
+    baseAttack: 60
+    criticalRateBonusPercent: 0
+    attackBonusPercent: 10
+    maxHealthBonusPercent: 0

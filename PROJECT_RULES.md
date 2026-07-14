@@ -1,5 +1,13 @@
 # ARPG Demo 项目规则与当前进展
 
+## 架构与职责规则
+
+- 每个脚本应尽量只承担一项明确职责，不要把输入、UI、数据存储和业务逻辑直接写在同一个脚本中。
+- 输入层只负责接收和转发输入；UI 层只负责界面展示和用户交互；数据层只负责数据结构、查询和持久化；业务层负责游戏规则和状态变更。
+- 跨系统通信优先使用事件、接口或管理器公开方法，不要直接访问其他类的内部字段或可变容器。
+- 需要暴露状态时，优先提供只读属性、查询方法或有边界的操作方法，避免外部任意修改内部数据。
+- 修改代码前，先说明涉及脚本的职责、依赖关系和跨系统通信方式，再实施修改。
+
 ## 项目定位
 
 这是一个基于 Unity 2022.3 的第三人称 ARPG Demo。当前目标是先做出一个可操作、可连招、可命中怪物、可播放受击和死亡反馈的基础战斗角色，再逐步接入敌人 AI、移动寻路、攻击、技能、UI 等模块。
@@ -151,6 +159,64 @@
   - Float：`Speed`
 - `EnemyAI` 只负责追击、攻击触发和 `Speed` 参数；受击、死亡 Trigger 仍由 `EnemyHitReaction` 负责。
 
+### 背包 / 物品数据
+
+- 已新增基础背包、物品配置、物品详情展示和本地存档功能。
+- `ItemDataManager` 是场景中的物品配置入口，在 `Awake()` 中读取 `Resources/Config/WeaponConfig.Json`，并按物品 `id` 建立查询字典。
+- `PackageItem` 当前包含：
+  - `id`
+  - `type`
+  - `name`
+  - `description`
+  - `imagePath`
+- 当前物品类型：`Weapon`、`Food`、`Prop`；只有 `Food` 和 `Prop` 可以堆叠，`Weapon` 每件独占一个格子。
+- `ItemVisualDatabaseSO` / `ItemVisualSO` 用于按物品 ID 配置图标和模型 Prefab；图标未配置时，回退到 `PackageItem.imagePath` 对应的 `Resources` 路径。
+- 物品配置 ID 必须大于 0 且保持唯一；视觉配置中的 `itemId` 必须与 JSON 配置一致。
+- `InventoryManager` 是静态背包数据入口，提供：
+  - `Load()` / `Save()`
+  - `AddItem()` / `RemoveItem()`
+  - `GetItemCount()` / `GetSlot()`
+  - `Clear()`
+- 背包存档使用 `JsonUtility` 写入 `Application.persistentDataPath/InventorySave.json`。
+- 背包修改后会触发 `InventoryChanged`，但不会自动保存；需要在合适的业务节点显式调用 `InventoryManager.Save()`。
+- `PackageUI` 监听 `InventoryChanged` 并动态刷新格子，按 `itemId`、`slotIndex` 排序显示；选中格子后显示图标、名称和描述。
+- 背包格子 Prefab 固定从 `Resources/Prefabs/UIPanel/PackageItem` 加载。
+- 当前可在 Play Mode 使用 `GMcmd/背包` 菜单添加 10 个随机武器或清空背包，用于测试配置、显示和存档链路。
+
+### 角色基础数据 / 存档
+
+- `PlayerSaveData` 只保存角色 ID、等级、当前经验和当前生命，不重复保存基础属性、成长值或最终属性。
+- `PlayerSaveManager` 使用 `Application.persistentDataPath/PlayerSave.json` 保存角色数据，默认在游戏启动时读取、退出时保存，也提供公开的 `Save()` / `Load()` 方法。
+- 加载时由 `CharacterConfigRegistry` 在 `Resources/Config` 下按角色 ID 查询 `CharacterBaseConfig`。
+- 恢复顺序为：恢复角色配置、清空运行时装备/Buff 加成、通过 `PlayerProgression.RestoreProgress()` 恢复等级与经验、通过 `PlayerStats.RestoreHealth()` 恢复当前生命。
+- 存档已预留 `equippedItems`，只记录装备槽位与物品实例 ID；装备属性仍应由未来的装备系统读取配置后统一提交给 `PlayerStats.SetEquipmentModifiers()`。
+- `GameScene` 的玩家对象已挂载 `PlayerSaveManager`，并绑定同对象上的 `PlayerStats` 与 `PlayerProgression`。
+
+### NPC 交互 / 对话
+
+- 已新增统一交互接口 `IInteractable`，交互对象需要实现：
+  - `Interact()`
+  - `GetInteractText()`
+  - `GetTransform()`
+- `PlayerInteract` 每帧响应旧输入系统的 `E` 键，通过半径 2 米的 `Physics.OverlapSphere` 查找交互对象；范围内有多个对象时选择距离最近的对象。
+- `PlayerInteractUI` 直接显示最近交互对象返回的提示文本，不通过 `UIManager` 动态创建。
+- `NpcInteract` 实现 `IInteractable`，每个 NPC 需要配置 `dialogueFile` 和 `interactText`。
+- NPC 交互后通过 `UIManager` 打开 `DialoguePanel`，并把 `TextAsset` 传给 `StartDialogue()`。
+- 对话 TXT 按换行拆分，行首尾空白和空行会被忽略；当前每个有效行代表一句对话。
+- 对话开始后显示第一句，后续使用旧输入系统鼠标左键逐句推进；最后一句之后自动关闭面板。
+- `DialoguePanel` 会记录打开帧，避免触发交互或打开面板的同一次点击直接跳过第一句。
+- NPC 没有配置 TXT、TXT 没有有效内容或对话文本引用未绑定时，需要保留明确的 Console 警告。
+
+### UI 面板管理
+
+- `UIManager` 当前管理 `PackagePanel`、`CharacterPanel`、`AbilityPanel`、`JingYanPanel`、`EquipmentPanel` 和 `DialoguePanel`，对应 Prefab 位于 `Resources/Prefabs/UIPanel/`。
+- C 键打开 `CharacterPanel`；其中 `AbilityButton` 与 `SelectedButton` 进入 `AbilityPanel`，`EquipmentButton` 进入 `EquipmentPanel`。
+- C 键可关闭当前打开的角色相关面板；B 键背包与角色相关面板互斥，切换时会先关闭另一组面板。
+- 面板 Prefab 根节点必须挂载 `BasePanel` 或其子类，同名面板不允许重复打开。
+- `BasePanel` 打开时进入 UI 模式：解锁并显示鼠标、清空玩家移动/视角/冲刺/Dash/Attack 输入，并停用玩家 `PlayerInput`。
+- `BasePanel` 关闭时恢复玩家输入、重新锁定鼠标，并从 `UIManager.panelDic` 移除面板。
+- Input System 中的 `Package` 与 `Character` action 会在 UI 模式下单独保持可用，以支持 B/C 键关闭对应面板；新增面板热键时需要同步检查这套输入启停逻辑。
+
 ## 当前 Animator 结构
 
 基础移动：
@@ -296,6 +362,26 @@ Enemy
 - Trigger：`Dead`
 - Float：`Speed`
 
+### UI / 背包对象
+
+- 场景中需要存在 `Canvas` 和一个可用的 `UIManager`；建议显式绑定 `uiRoot`，未绑定时会自动查找 Canvas。
+- 场景中需要存在一个 `ItemDataManager`，并为其绑定 `ItemVisualDatabaseSO`（允许暂时为空，但模型查询和视觉数据库图标回退将不可用）。
+- `PackagePanel.prefab` 根节点挂 `PackageUI`，并保留脚本当前查找的节点名称：
+  - `Content`
+  - `Weapon`
+  - `Weapon (1)`
+  - `WeaponName`
+  - `Description`
+  - `Button`
+- `PackageItem.prefab` 使用 `PackageSlotUI`，并保留：`weapon`、`Level`、`Selected`、`UnSelected` 节点。
+- `DialoguePanel.prefab` 根节点挂 `DialoguePanel`，并绑定 `dialogueText`。
+
+### 玩家 / NPC 交互对象
+
+- 玩家需要挂 `PlayerInteract`；场景提示 UI 需要挂 `PlayerInteractUI`，并绑定玩家、提示容器和提示文字。
+- NPC 需要挂 `NpcInteract` 和可被 `Physics.OverlapSphere` 检测到的 Collider。
+- NPC 的 `dialogueFile` 使用 TXT `TextAsset`，`interactText` 用于玩家靠近时的交互提示。
+
 ## 动画事件要求
 
 ### Dash 动画
@@ -380,6 +466,11 @@ Attack01
 - `PlayerAttack` 的移动取消逻辑只在当前 Animator State 已经进入收招状态时触发，避免出招阶段持续移动输入过早解锁攻击状态。
 - 武器 Hitbox 是检测器，不应该用于真实物理阻挡。
 - 怪物当前已经接入基础追击和攻击触发 AI，但尚未实现真正的怪物伤害判定、攻击命中窗口、巡逻和复杂行为树。
+- 背包的增删操作只修改内存并发送刷新事件，不会自动落盘；退出游戏或切换流程前必须显式保存。
+- `InventoryManager.AddItem()` 在 `ItemDataManager.Instance` 不存在或查不到配置时，会把物品按不可堆叠处理；正常游戏流程应保证物品数据管理器先初始化。
+- `PackageUI` 和 `PackageSlotUI` 当前依赖固定的子节点名称，调整 UI Prefab 层级或命名后必须同步更新脚本。
+- 对话推进与玩家交互当前仍使用旧输入 API（`Input.GetMouseButtonDown` / `Input.GetKeyDown`），而移动和战斗主要使用 Input System；后续应统一输入方案。
+- `BasePanel` 按单面板场景管理玩家输入；如果未来允许背包、对话或其他模态面板同时存在，需要改成面板栈或引用计数，避免关闭一个面板时过早恢复玩家操作。
 - Git 状态暂时未检查成功，因为当前仓库触发过 Git dubious ownership 保护；如需查看状态，需要把该路径加入 `safe.directory`。
 
 ## 建议下一步
@@ -387,6 +478,8 @@ Attack01
 1. 给 `PlayerAttack.EndAttack()` 增加强制关闭武器 Hitbox 的兜底，避免漏配 `EndWeaponHit` 导致判定残留。
 2. 给死亡后的怪物关闭 Collider 或禁用 `EnemyDamageReceiver`，避免尸体继续被命中。
 3. 给怪物攻击增加命中检测、伤害窗口和对玩家造成伤害的逻辑。
-4. 增加简单受击硬直或击退表现。
-5. 增加伤害飘字或血条 UI。
-6. 基础追击稳定后，再接入巡逻、攻击前摇/后摇、仇恨范围和更复杂 AI。
+4. 统一背包、交互和对话的输入到 Input System，并补充 UI 模式下的输入冲突处理。
+5. 为背包增加容量限制、格子交换/排序和明确的自动保存时机。
+6. 为对话增加说话者名称、头像、打字机效果和分支/任务事件接口。
+7. 增加简单受击硬直、击退、伤害飘字或血条 UI。
+8. 基础追击稳定后，再接入巡逻、攻击前摇/后摇、仇恨范围和更复杂 AI。

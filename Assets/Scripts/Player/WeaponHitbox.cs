@@ -7,11 +7,11 @@ public class WeaponHitbox : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private PlayerAttack playerAttack;
+    [SerializeField] private PlayerStats playerStats;
     [SerializeField] private GameObject attacker;
 
     [Header("Damage")]
-    [SerializeField] private int defaultDamage = 10;
-    [SerializeField] private int[] comboDamages = { 10, 12, 15, 20 };
+    [SerializeField, Min(0)] private int fallbackDamage = 10;
     [SerializeField] private LayerMask targetLayers = ~0;
     [SerializeField] private bool logHits;
 
@@ -51,13 +51,15 @@ public class WeaponHitbox : MonoBehaviour
     public void BeginHitWindow()
     {
         int comboIndex = playerAttack != null ? playerAttack.CurrentComboIndex : 0;
-        BeginHitWindow(GetDamageForCombo(comboIndex), comboIndex);
+        BeginHitWindow(GetCharacterAttackDamage(), comboIndex);
     }
 
-    public void BeginHitWindow(int damage)
+    public void BeginHitWindow(int animationEventDamage)
     {
         int comboIndex = playerAttack != null ? playerAttack.CurrentComboIndex : 0;
-        BeginHitWindow(damage, comboIndex);
+
+        // 保留带 int 参数的动画事件接口，但伤害统一使用角色总攻击力。
+        BeginHitWindow(GetCharacterAttackDamage(), comboIndex);
     }
 
     public void EndHitWindow()
@@ -83,15 +85,12 @@ public class WeaponHitbox : MonoBehaviour
         }
     }
 
-    private int GetDamageForCombo(int comboIndex)
+    private int GetCharacterAttackDamage()
     {
-        int arrayIndex = comboIndex - 1;
-        if (comboDamages != null && arrayIndex >= 0 && arrayIndex < comboDamages.Length)
-        {
-            return comboDamages[arrayIndex];
-        }
-
-        return defaultDamage;
+        EnsureReferences();
+        return playerStats == null
+            ? fallbackDamage
+            : Mathf.Max(0, playerStats.Attack);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -165,6 +164,11 @@ public class WeaponHitbox : MonoBehaviour
         if (playerAttack == null)
         {
             playerAttack = GetComponentInParent<PlayerAttack>();
+        }
+
+        if (playerStats == null)
+        {
+            playerStats = GetComponentInParent<PlayerStats>();
         }
 
         if (attacker == null)

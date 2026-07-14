@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4f1b77307a34464b00a8dd8f138e774, type: 3}
+  m_Name: EquipmentDataConfig
+  m_EditorClassIdentifier: 
+  itemDataList:
+  - id: 1001
+    type: 4
+    name: "\u9707\u661F\u8FEA\u65AF\u79D1"
+    description: "\u4E13\u95E8\u5728\u4E0E\u97F3\u64CE\u7684\u517C\u5BB9\u6027\u4E0A\u505A\u4E86\u7B97\u6CD5\u4F18\u5316\u7684\u9A71\u52A8\u76D8\uFF0C\u80FD\u591F\u66F4\u597D\u5730\u53D1\u6325\u8F85\u52A9\u529F\u80FD\u3002"
+    effectDescription: "\u51B2\u51FB\u529B\u63D0\u53476%\u3002"
+    ItemIcon: {fileID: 21300000, guid: c54a3d1d051bcc343ac02b2c7ab23c7f, type: 3}
+    TypeIcon: {fileID: 21300000, guid: d760f287e62b60447b9ab03c1b6e0399, type: 3}
+    maxHealth: 100
+    attack: 20
+    defense: 20
+  - id: 1002
+    type: 4
+    name: "\u6FC0\u7D20\u670B\u514B"
+    description: "\u7A7A\u6D1E\u8C03\u67E5\u534F\u4F1A\u5EFA\u8BAE\u614E\u91CD\u9009\u62E9\u7684\u9A71\u52A8\u76D8\u7CFB\u5217\uFF0C\u636E\u4E0D\u5B8C\u5168\u7EDF\u8BA1\uFF0C\u88C5\u914D\u8BE5\u9A71\u52A8\u76D8\u7684\u8C03\u67E5\u5458\u4F1A\u5C55\u73B0\u51FA\u66F4\u9AD8\u7684\u6218\u6597\u6B32\u671B\u3002"
+    effectDescription: "\u653B\u51FB\u529B\u63D0\u534710%\u3002"
+    ItemIcon: {fileID: 21300000, guid: 49d35ecc1f74e6f4fa7fed7142eb41a7, type: 3}
+    TypeIcon: {fileID: 21300000, guid: 7f8fdc473c1f09b40981091287edeb8d, type: 3}
+    maxHealth: 10
+    attack: 80
+    defense: 30
+  - id: 1003
+    type: 4
+    name: "\u5544\u6728\u9E1F\u7535\u97F3"
+    description: "\u706B\u5230\u51FA\u5708\u7684\u9A71\u52A8\u76D8\uFF0C\u5373\u4F7F\u662F\u4E0D\u4ECE\u4E8B\u7A7A\u6D1E\u5DE5\u4F5C\u7684\u666E\u901A\u5E02\u6C11\uFF0C\u4E5F\u4F1A\u60F3\u65B9\u8BBE\u6CD5\u4E70\u6765\u6536\u85CF\u3002\u53EA\u56E0\u523B\u5F55\u5728\u5176\u4E2D\u7684\u66F2\u8C03\u5B9E\u5728\u662F\u592A\u6D17\u8111\u4E86\u3002"
+    effectDescription: "\u66B4\u51FB\u7387\u63D0\u53478%\u3002"
+    ItemIcon: {fileID: 21300000, guid: 63ade041a3c0a9d45acecb9ba5e29d98, type: 3}
+    TypeIcon: {fileID: 21300000, guid: b10686f90afa7934493fb290cc23ca45, type: 3}
+    maxHealth: 50
+    attack: 30
+    defense: 80

@@ -14,6 +14,9 @@ namespace StarterAssets
         public bool Dash;
         public bool Attack;
 
+        public event System.Action PackagePressed;
+        public event System.Action CharacterPressed;
+
         [Header("Movement Settings")]
         public bool analogMovement;
 
@@ -53,6 +56,22 @@ namespace StarterAssets
         public void OnAttack(InputValue value)
         {
             AttackInput(value.isPressed);
+        }
+
+        public void OnPackage(InputValue value)
+        {
+            if (value.isPressed)
+            {
+                PackagePressed?.Invoke();
+            }
+        }
+
+        public void OnCharacter(InputValue value)
+        {
+            if (value.isPressed)
+            {
+                CharacterPressed?.Invoke();
+            }
         }
 #endif
 
